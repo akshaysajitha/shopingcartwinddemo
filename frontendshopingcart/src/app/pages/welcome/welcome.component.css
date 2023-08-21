@@ -1,0 +1,17 @@
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Creates 4 equal-width columns */
+    gap: 20px; /* Adjust spacing between cards */
+  }
+#cart{
+  margin-inline-end: auto;
+}  
+#cartdiv {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px; /* Optional: Add margin between the button and cards */
+  }
+  
+  #cartbutton {
+    margin-left: auto;
+  }

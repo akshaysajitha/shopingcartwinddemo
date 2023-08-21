@@ -1,1 +1,19 @@
-<h1>welcome work</h1>
+<div id="cartdiv" style="width: 100%;">
+     <button nz-button nzType="primary" (click)="onButtonClick()" id="cartbutton">go to cart</button>
+  </div>
+  <div class="card-container">
+    <ng-container *ngFor="let item of productdata; let i = index">
+      <nz-card style="width:300px;" [nzCover]="coverTemplate" [nzActions]="[actionSetting,]">
+        <nz-card-meta nzTitle="{{item.name }}" nzDescription="{{item.shortdiscretion}}"></nz-card-meta>
+        <nz-card-meta nzTitle="{{item.rate  | currency}}"></nz-card-meta>
+      </nz-card>
+      <ng-template #coverTemplate>
+        <img alt="example" src="{{item.imageurl }}" />
+        <input type="number" [(ngModel)]="item.quantity" placeholder="Quantity">
+      </ng-template>
+      <ng-template #actionSetting>
+        <button nz-button nzType="primary" (click)="addtocart(item)">Add to Cart</button>
+      </ng-template>
+    </ng-container>
+  </div>
+  
