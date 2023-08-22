@@ -15,10 +15,11 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OrderplacedComponent } from './completeorder/orderplaced/orderplaced.component';
 import { NzResultModule } from 'ng-zorro-antd/result';
+import { OrderviewComponent } from './orderitem/orderview/orderview.component';
 @NgModule({
   imports: [WelcomeRoutingModule,CommonModule,NzCardModule,NzIconModule,NzButtonModule,NzDescriptionsModule,
     FormsModule,NzFormModule,ReactiveFormsModule,NzResultModule],
-  declarations: [WelcomeComponent, CartComponent, HeaderComponent, OrderplacedComponent],
+  declarations: [WelcomeComponent, CartComponent, HeaderComponent, OrderplacedComponent, OrderviewComponent],
   exports: [WelcomeComponent]
 })
 export class WelcomeModule { }

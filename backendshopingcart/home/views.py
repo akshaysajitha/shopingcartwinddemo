@@ -122,3 +122,20 @@ def cartcomplete(request):
     mydb.close()
     return JsonResponse( request_data,safe=False)
 
+@csrf_exempt
+def vieworderitem(request):
+    global stype
+    mydb=mysql.connector.connect(host='localhost',user='root',password='root123',database='shopingcart')
+    mycursor=mydb.cursor()
+    # q="select *from ordertemp where sessionid='"+str(stype)+"'"
+    q="select *from ordertemp where sessionid='"+str(stype)+"'AND status='finish'"
+    print(q)
+    mycursor.execute(q)
+    row=mycursor.fetchall()
+    formatted_data = []
+
+    for rows in row:
+        data = dict(zip(mycursor.column_names, rows))
+        formatted_data.append(data)
+           
+    return JsonResponse( formatted_data,safe=False)

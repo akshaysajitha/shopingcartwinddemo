@@ -32,6 +32,9 @@ export class CartComponent implements OnInit {
     this.router.navigate(['header'])
   
   }
+  orderitemview(){
+    this.router.navigate(['OrderviewComponent'])
+  }
  
 
 }

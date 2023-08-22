@@ -54,5 +54,8 @@ export class MyServiceService {
     data.generatedCode = this.generatedCode;
     return this.http.post(url,data);
   }
+  getvieworderitem():Observable<any>{
+    return this.http.get<any>('http://127.0.0.1:8000/home/vieworderitem');
+  }
 
 }
