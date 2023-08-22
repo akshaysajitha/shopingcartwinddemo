@@ -1,8 +1,9 @@
 
-<h1>order item </h1>
-<div id="cartdiv" style="width: 100%;">
+<h1 class="cart-heading">order item</h1>
+
+<!-- <div id="cartdiv" style="width: 100%;">
   <button nz-button nzType="primary" (click)="onButtonClickproduct()" id="cartbutton">product</button>
-</div>
+</div> -->
     <div class="card-container">
       <ng-container *ngFor="let item of productdata; let i = index">
         <nz-card style="width:300px;" [nzCover]="coverTemplate" [nzActions]="[actionSetting,]">

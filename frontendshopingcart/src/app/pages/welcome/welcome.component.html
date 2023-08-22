@@ -1,8 +1,9 @@
-<div id="cartdiv" style="width: 100%;">
-  <!-- <a href="OrderviewComponent"> ordered item</a> -->
-  
+<!-- <div id="cartdiv" style="width: 100%;">
      <button nz-button nzType="primary" (click)="onButtonClick()" id="cartbutton">go to cart</button>
-  </div>
+  </div> -->
+  <h1 class="cart-heading">Cart page</h1>
+
+
   <div class="card-container">
     <ng-container *ngFor="let item of productdata; let i = index">
       <nz-card style="width:300px;" [nzCover]="coverTemplate" [nzActions]="[actionSetting,]">
@@ -11,7 +12,7 @@
       </nz-card>
       <ng-template #coverTemplate>
         <img alt="example" src="{{item.imageurl }}" />
-        <input type="number" [(ngModel)]="item.quantity" placeholder="Quantity">
+        <input type="number" [(ngModel)]="item.quantity" placeholder="Quantity" min="1">
       </ng-template>
       <ng-template #actionSetting>
         <button nz-button nzType="primary" (click)="addtocart(item)">Add to Cart</button>
