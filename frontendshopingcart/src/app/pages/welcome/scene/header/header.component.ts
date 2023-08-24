@@ -47,6 +47,8 @@ export class HeaderComponent implements OnInit {
       state: [null, [Validators.required]],
       country: [null, [Validators.required]],
       pincode: [null, [Validators.required]],
+      email:[null,[Validators.required]],
+      number:[null,[Validators.required]],
 
       remember: [true]
     });

@@ -58,4 +58,11 @@ export class MyServiceService {
     return this.http.get<any>('http://127.0.0.1:8000/home/vieworderitem');
   }
 
+  uservalidation(data: any): Observable<any> {
+    const url = 'http://127.0.0.1:8000/home/uservalidate';
+    return this.http.post(url,data);
+  }
+
+
+
 }

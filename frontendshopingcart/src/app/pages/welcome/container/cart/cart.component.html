@@ -9,13 +9,13 @@
  <div class="card-container">
    <ng-container *ngFor="let item of productdata; let i = index">
      <nz-card style="width:300px;" [nzCover]="coverTemplate" [nzActions]="[actionSetting,]">
-       <nz-card-meta nzTitle="{{item.pname }}" nzDescription="{{item.shortdiscretion}}"></nz-card-meta>
-       <nz-card-meta nzTitle="product  price,{{item.productprice	 | currency}}"></nz-card-meta>
-       <nz-card-meta nzTitle="Qty,{{item.productqty}}"></nz-card-meta>
-       <nz-card-meta nzTitle="total,{{item.producttotal | currency}}"></nz-card-meta>
+       <nz-card-meta nzTitle="{{item.product_name }}" nzDescription="{{item.product_discretion}}"></nz-card-meta>
+       <nz-card-meta nzTitle="product  price,{{item.product_price	 | currency:'INR'}}"></nz-card-meta>
+       <nz-card-meta nzTitle="Qty,{{item.product_quantity}}"></nz-card-meta>
+       <nz-card-meta nzTitle="Total,{{item.product_total | currency:'INR'}}"></nz-card-meta>
      </nz-card>
      <ng-template #coverTemplate>
-       <img alt="example" src="{{item.productimage }}" />
+       <img alt="example" src="{{item.product_image }}" />
        <!-- <input type="number" [(ngModel)]="item.quantity" placeholder="Quantity"> -->
      </ng-template>
      <ng-template #actionSetting>

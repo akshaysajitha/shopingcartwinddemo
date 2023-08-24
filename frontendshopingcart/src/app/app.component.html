@@ -5,9 +5,11 @@
       
       <div class="app-header">
         <ul class="inline-list">
+        <li><a [routerLink]="['/login']" routerLinkActive="router-link-active" >login</a></li>
         <li><a [routerLink]="['/welcome']">product</a></li>
         <li><a [routerLink]="['/cart']">cart</a></li>
         <li><a [routerLink]="['/orderitemview']">ordered item</a></li>
+        
         </ul>
         <!-- <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
             <i class="trigger"
