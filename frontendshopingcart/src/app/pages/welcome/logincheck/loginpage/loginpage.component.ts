@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MyServiceService } from 'src/app/my-service.service';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-loginpage',
   templateUrl: './loginpage.component.html',
@@ -10,7 +11,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class LoginpageComponent implements OnInit {
   validateForm!: FormGroup;
   productdata!: any[];
-  constructor(private myservice: MyServiceService, private router: Router,private fb: FormBuilder) { }
+  submittedNumber: number | null = null;
+  constructor(private myservice: MyServiceService, private router: Router,private fb: FormBuilder,private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.validateForm = this.fb.group({
@@ -23,17 +25,21 @@ export class LoginpageComponent implements OnInit {
   // form submit 
   submitForm(): void {
     if (this.validateForm.valid) {
-      console.log('submit', this.validateForm.value);
-      
       const formValue = this.validateForm.value;
-    this.myservice.uservalidation(formValue).subscribe(
-      response => {
-        this.productdata = response; 
-        console.log('email number check',this.productdata)
-      })
-      // this.router.navigate(['/orderplaced'])
-     
-    } else {
+      this.submittedNumber = formValue.number;
+
+      this.myservice.uservalidation(formValue).subscribe(
+        response => {
+          this.productdata = response.cart_items;
+
+          // Navigate to the orderview page with query parameters
+          this.router.navigate(['/orderitemview'], { queryParams: { productdata: JSON.stringify(this.productdata) } });
+        },
+        error => {
+          console.error('Error:', error);
+        }
+      );
+    }else {
       Object.values(this.validateForm.controls).forEach(control => {
         if (control.invalid) {
           control.markAsDirty();
@@ -41,8 +47,9 @@ export class LoginpageComponent implements OnInit {
         }
       });
     }
-    
   }
+  
+  
     
   // form submit end
 

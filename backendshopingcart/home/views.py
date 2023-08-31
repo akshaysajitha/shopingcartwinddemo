@@ -88,7 +88,7 @@ def cartview(request):
     mycursor = mydb.cursor()
 
     # Get the order_table_master ID for the given session
-    q_order_master_id = "SELECT id FROM order_table_master WHERE sessionid = %s"
+    q_order_master_id = "SELECT id FROM order_table_master WHERE sessionid = %s AND status='create' "
     mycursor.execute(q_order_master_id, (stype,))
     order_master_id = mycursor.fetchone()
 
@@ -153,77 +153,162 @@ def cartview(request):
 @csrf_exempt
 def cartcomplete(request):
     request_data = json.loads(request.body)
-    sessionid=request_data['generatedCode']
-    pincode=request_data['pincode']
-    country=request_data['country']
-    state=request_data['state']
-    city=request_data['city']
-    name=request_data['userName']
-    day=datetime.today().date()
-    email=request_data['email']
-    number=request_data['number']
-    mydb=mysql.connector.connect(host='localhost',user='root',password='root123',database='shopingcart')
-    mycursor=mydb.cursor()
-    # test take total amount
-    q_sum = "SELECT SUM(producttotal) FROM ordertemp WHERE sessionid = '" + str(sessionid) + "'"
-    mycursor.execute(q_sum)
-    sum_result = mycursor.fetchone()
-    total_price_sum = sum_result[0] if sum_result[0] is not None else 0      
-    q_total="SELECT SUM(producttotal) AS total_sum FROM ordertemp where sessionid='"+str(sessionid)+"'" 
-    mycursor.execute(q_total)
-    total=mycursor.fetchone()
-    total_str=str(total_price_sum)
-    print('total cart amount',total_str,type(total_str))
-    # test end
-    q="insert into order_table_master (sessionid,date,total,name,city,state,country,pincode,phnumber,email)values('"+str(sessionid)+"','"+str(day)+"','"+str(total_str)+"','"+str(name)+"','"+str(city)+"','"+str(state)+"','"+str(country)+"','"+str(pincode)+"','"+str(number)+"','"+str(email)+"')"
-    mycursor.execute(q)
+    sessionid = request_data['generatedCode']
+    pincode = request_data['pincode']
+    country = request_data['country']
+    state = request_data['state']
+    city = request_data['city']
+    name = request_data['userName']
+    day = datetime.today().date()
+    email = request_data['email']
+    number = request_data['number']
+    request.session['user_number'] = number
+    request.session.save()
+
+    # Establish MySQL connection
+    mydb = mysql.connector.connect(host='localhost', user='root', password='root123', database='shopingcart')
+    mycursor = mydb.cursor()
+
+    # Update query for order_table_master with parameterized placeholders
+    update_order_master_query = "UPDATE order_table_master SET name = %s, city = %s, state = %s, country = %s, pincode = %s, phnumber = %s, email = %s WHERE sessionid = %s"
+    update_order_master_values = (name, city, state, country, pincode, number, email, sessionid)
+
+    # Execute the update query for order_table_master with parameterized values
+    mycursor.execute(update_order_master_query, update_order_master_values)
+
+    # Update query for ordertemp to update status
+    update_ordertemp_query = "UPDATE ordertemp SET status = 'finish' WHERE omid IN (SELECT id FROM order_table_master WHERE sessionid = %s)"
+    update_ordertemp_value = (sessionid,)
+
+    # Execute the update query for ordertemp with parameterized values
+    mycursor.execute(update_ordertemp_query, update_ordertemp_value)
+
     mydb.commit()
-    statusset="UPDATE order_table_master AS otm JOIN ordertemp AS ot ON otm.sessionid = ot.sessionid SET otm.status = 'finish', ot.status = 'finish' WHERE otm.sessionid = '"+str(sessionid)+"'"
-    mycursor.execute(statusset)
-    mydb.commit()
+
+    mycursor.close()
     mydb.close()
-    return JsonResponse( request_data,safe=False)
+
+    return JsonResponse(request_data, safe=False)
+
+
 
 @csrf_exempt
+# view working
 def vieworderitem(request):
     global stype
+    data=[{'data':'true'}]
     mydb=mysql.connector.connect(host='localhost',user='root',password='root123',database='shopingcart')
     mycursor=mydb.cursor()
-    # q="select *from ordertemp where sessionid='"+str(stype)+"'"
-    q="select *from ordertemp where sessionid='"+str(stype)+"'AND status='finish'"
-    print(q)
-    mycursor.execute(q)
-    row=mycursor.fetchall()
-    formatted_data = []
+     # Get the order_table_master ID for the given session
+    q_order_master_id = "SELECT id FROM order_table_master WHERE sessionid = %s AND status='create' "
+    mycursor.execute(q_order_master_id, (stype,))
+    order_master_id = mycursor.fetchone()
 
-    for rows in row:
-        data = dict(zip(mycursor.column_names, rows))
-        formatted_data.append(data)
-           
-    return JsonResponse( formatted_data,safe=False)
+    if order_master_id:
+        # Get all the rows from ordertemp for the given order_table_master ID
+        q_ordertemp = "SELECT * FROM ordertemp WHERE omid = %s AND status = 'finish'"
+        mycursor.execute(q_ordertemp, (order_master_id[0],))
+        ordertemp_rows = mycursor.fetchall()
+
+        formatted_data = []
+        for ordertemp_row in ordertemp_rows:
+            product_id = ordertemp_row[1]  # Product ID (pid) from ordertemp
+            product_details_query = "SELECT * FROM products WHERE pid = %s"
+            mycursor.execute(product_details_query, (product_id,))
+            product_details = mycursor.fetchone()
+
+            if product_details:
+                data = {
+                    'ordertemp_id': ordertemp_row[0],
+                    'product_id': product_details[0],  # Product ID from products
+                    'product_name': product_details[1],  # Product name from products
+                    'product_price': product_details[2],  # Product price from products
+                    'product_image':product_details[3],
+                    'product_discretion':product_details[5],
+                    
+
+                    'product_quantity': ordertemp_row[5],  # Product quantity from ordertemp
+                    'product_total': ordertemp_row[6],  # Product total from ordertemp
+                    # Include other relevant details as needed
+                }
+                formatted_data.append(data)
+
+        q_sum = "SELECT SUM(producttotal) FROM ordertemp WHERE omid = %s AND status = 'create'"
+        mycursor.execute(q_sum, (order_master_id[0],))
+        sum_result = mycursor.fetchone()
+        total_price_sum = sum_result[0] if sum_result[0] is not None else 0
+        
+        q_total = "SELECT SUM(producttotal) AS total_sum FROM ordertemp WHERE omid = %s AND status = 'create'"
+        mycursor.execute(q_total, (order_master_id[0],))
+        total = mycursor.fetchone()
+        print('total cart amount', total)
+        mycursor.close()
+        mydb.close()
+
+        response_data = {
+            'cart_items': formatted_data,
+            'total_price_sum': total_price_sum,
+            'carttotal': total[0] if total else 0
+        }
+
+        return JsonResponse(formatted_data, safe=False)
+    else:
+        mydb.close()
+        response_data = {'error': 'No cart items for the session'}
+        return JsonResponse(formatted_data, safe=False)
+
+    # This is the default return statement in case of unexpected errors
+    return JsonResponse({'error': 'An unexpected error occurred'}, safe=False)
 @csrf_exempt
 def uservalidate(request):
+    response_data = {'data': 'true'}
     request_data = json.loads(request.body)
-    email=request_data['email']
-    phonenumber=request_data['number']
-    mydb=mysql.connector.connect(host='localhost',user='root',password='root123',database='shopingcart')
-    mycursor=mydb.cursor()
-    q = (
-    "SELECT ot.pname, ot.productimage, ot.productprice, ot.productqty, ot.producttotal, "
-    "otm.email, otm.phnumber "
-    "FROM ordertemp ot "
-    "JOIN order_table_master otm ON ot.sessionid = otm.sessionid "
-    "WHERE otm.email = '"+str(email)+"' AND otm.phnumber = '"+str(phonenumber)+"' "
-    "AND ot.status = 'finish' AND otm.status = 'finish';"
-    )
+    provided_number = request_data['number']
+    
+    mydb = mysql.connector.connect(host='localhost', user='root', password='root123', database='shopingcart')
+    mycursor = mydb.cursor(buffered=True)  # Use buffered cursor
+    
+    try:
+        # Check if the provided number is associated with an order
+        q_order_master_id = "SELECT id FROM order_table_master WHERE phnumber = %s AND status = 'create'"
+        mycursor.execute(q_order_master_id, (provided_number,))
+        order_master_id = mycursor.fetchone()
+        
+        if order_master_id:
+            omid = order_master_id[0]
+            # Get all product details from ordertemp and products tables
+            q_ordertemp = """
+                SELECT o.pid, p.*
+                FROM ordertemp o
+                JOIN products p ON o.pid = p.pid
+                WHERE o.omid = %s AND o.status = 'finish'
+            """
+            mycursor.execute(q_ordertemp, (omid,))
+            ordertemp_rows = mycursor.fetchall()
 
-    mycursor.execute(q)
-    row=mycursor.fetchall()
-    formatted_userdata = []
+            formatted_data = []
+            for ordertemp_row in ordertemp_rows:
+                data = {
+                    'product_id': ordertemp_row[0],
+                    'product_name': ordertemp_row[2],
+                    'product_price': ordertemp_row[3],
+                    'product_image': ordertemp_row[4],
+                    # Include other product details here
+                }
+                formatted_data.append(data)
 
-    for rows in row:
-        data = dict(zip(mycursor.column_names, rows))
-        formatted_userdata.append(data)   
-    mydb.close()
-   
-    return JsonResponse(formatted_userdata,safe=False)
+            response_data['cart_items'] = formatted_data
+
+        else:
+            response_data['error'] = 'No cart items for the provided number'
+
+    except mysql.connector.Error as e:
+        response_data['error'] = str(e)
+
+    finally:
+        mycursor.close()
+        mydb.close()
+    
+    return JsonResponse(response_data, safe=False)
+
+# setdemofinish
