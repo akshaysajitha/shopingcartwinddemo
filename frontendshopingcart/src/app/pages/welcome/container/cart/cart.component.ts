@@ -10,9 +10,11 @@ export class CartComponent implements OnInit {
   productdata!: any[];
   totalPriceSum: string = '';
   cartsum:string=''
+  phoneNumber: string | null = null; 
   constructor(private myservice: MyServiceService, private router: Router) { }
 
   ngOnInit(): void {
+    this.phoneNumber = localStorage.getItem('userPhoneNumber');
     this.myservice.getcartdata().subscribe(
       (response) => {
         this.productdata = response.cart_items;

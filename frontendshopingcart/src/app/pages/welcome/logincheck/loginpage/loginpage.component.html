@@ -1,4 +1,5 @@
 <!-- <h1 class="cart-heading">order search</h1> -->
+<button nz-button class="login-form-button top-right-button "  (click)="logout()" [nzType]="'primary'">logout</button>
 <form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="submitForm()">
 
       <nz-form-item>
@@ -25,8 +26,10 @@
         <a class="login-form-forgot">Forgot password</a>
       </div>
     </div> -->
-    <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'">Submit</button>
+    <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'">login</button>
+    
+   
     <!-- Or
     <a>register now!</a> -->
-  </form>
+  </form> 
   <!-- form end  -->

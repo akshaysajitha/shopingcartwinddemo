@@ -54,9 +54,12 @@ export class MyServiceService {
     data.generatedCode = this.generatedCode;
     return this.http.post(url,data);
   }
-  getvieworderitem():Observable<any>{
-    return this.http.get<any>('http://127.0.0.1:8000/home/vieworderitem');
-  }
+
+  getvieworderitem(phoneNumber: string |null = null): Observable<any> {
+  // Include the phoneNumber as a query parameter in the URL
+  const url = `http://127.0.0.1:8000/home/vieworderitem?phoneNumber=${phoneNumber}`;
+  return this.http.get<any>(url);
+}
 
   uservalidation(data: any): Observable<any> {
     const url = 'http://127.0.0.1:8000/home/uservalidate';

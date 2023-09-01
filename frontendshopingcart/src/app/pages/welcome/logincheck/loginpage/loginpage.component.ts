@@ -26,20 +26,25 @@ export class LoginpageComponent implements OnInit {
   submitForm(): void {
     if (this.validateForm.valid) {
       const formValue = this.validateForm.value;
-      this.submittedNumber = formValue.number;
-
+      const submittedNumber = formValue.number;
+  
+      // Save the phone number in localStorage
+      localStorage.setItem('userPhoneNumber', submittedNumber);
+  
+      // Continue with your API call
       this.myservice.uservalidation(formValue).subscribe(
         response => {
           this.productdata = response.cart_items;
-
+          this.router.navigate(['/OrderviewComponent']);
+  
           // Navigate to the orderview page with query parameters
-          this.router.navigate(['/orderitemview'], { queryParams: { productdata: JSON.stringify(this.productdata) } });
+          // this.router.navigate(['/OrderviewComponent'], { queryParams: { productdata: JSON.stringify(this.productdata) } });
         },
         error => {
           console.error('Error:', error);
         }
       );
-    }else {
+    } else {
       Object.values(this.validateForm.controls).forEach(control => {
         if (control.invalid) {
           control.markAsDirty();
@@ -49,7 +54,9 @@ export class LoginpageComponent implements OnInit {
     }
   }
   
-  
+  logout(){
+    localStorage.clear();
+  }
     
   // form submit end
 
